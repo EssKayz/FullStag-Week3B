@@ -53,13 +53,13 @@ function containsName(name) {
 app.post('/api/persons', (request, response) => {
   const body = request.body
 
-  if (body.content === undefined || body.content.length < 1) {
+  if (body.name === undefined || body.name.length < 1) {
     return response.status(400).json({
       error: 'content missing'
     })
   }
 
-  if(containsName(body.content)){
+  if(containsName(body.name)){
     return response.status(400).json({
       error: 'name must be unique'
     })
@@ -67,18 +67,13 @@ app.post('/api/persons', (request, response) => {
 
   const pers = {
     id: randomInt(0, 1000000),
-    name: body.content,
+    name: body.name,
     number: body.number
   }
 
   people = people.concat(pers)
 
   response.json(pers)
-})
-
-
-app.get('/', (req, res) => {
-  res.send('<h1>Whalecum!</h1>')
 })
 
 app.get('/info', (req, res) => {
