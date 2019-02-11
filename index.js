@@ -11,7 +11,7 @@ app.use(cors())
 app.use(express.static('build'))
 
 morgan.token('cont', function (req, res) {
-  return JSON.stringify({ name: req.body.content, number: req.body.number })
+  return JSON.stringify({ name: req.body.name, number: req.body.number })
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :cont'))
