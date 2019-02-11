@@ -13,6 +13,7 @@ app.use(express.static('build'))
 morgan.token('cont', function (req, res) {
   return JSON.stringify({ name: req.body.content, number: req.body.number })
 })
+
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :cont'))
 
 app.post('/api/persons/', (request, response, next) => {
@@ -38,8 +39,7 @@ app.get('/info', (req, res) => {
   let howmany = 0
   Person.count({}, function (err, count) {
     howmany += count
-    console.log("Number of users:", howmany);
-    let moment = new Date().toString().replace(/\.\w*/, '');
+    let moment = new Date().toString().replace(/\.\w*/, '')
     res.send(
       `<p>Puhelinluettelossa ${howmany} henkilon tiedot</p>
       <p> ${moment} </p>
@@ -49,9 +49,7 @@ app.get('/info', (req, res) => {
 })
 
 app.get('/api/persons', (req, res) => {
-  console.log('Getting shit')
   Person.find({}).then(persn => {
-    console.log(persn)
     res.json(persn)
   })
 })
@@ -62,7 +60,7 @@ app.get('/api/persons/:id', (request, response, next) => {
   }).catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id)
     .then(result => {
       response.status(204).end()
@@ -84,14 +82,14 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
   console.error(error.message)
 
-  if (error.name === 'CastError' && error.kind == 'ObjectId') {
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(400).send({ error: 'nonexisting id' })
   }
-  
-  if(error.code === 11000){
-    return response.status(400).send({error: 'Name is already in use'})
+
+  if (error.code === 11000) {
+    return response.status(400).send({ error: 'Name is already in use' })
   }
-  
+
   next(error)
 }
 
