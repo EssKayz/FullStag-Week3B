@@ -15,34 +15,23 @@ morgan.token('cont', function (req, res) {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :cont'))
 
-function randomInt(low, high) {
-  return Math.floor(Math.random() * (high - low) + low)
-}
-
-function containsName(name) {
-  if (people.some(e => e.name === name)) {
-    return true;
-  }
-  return false;
-}
-
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons/', (request, response, next) => {
   const body = request.body
-
-  if (body.name === undefined || body.name.length < 1) {
+  if (body.name === undefined || body.number === undefined) {
     return response.status(400).json({
       error: 'content missing'
     })
   }
 
-  const pers = new Person({
+  const person = new Person({
     name: body.name,
     number: body.number
   })
 
-  pers.save().then(savedPers => {
-    response.json(savedPers.toJSON())
-  })
+  person.save().then(savedPerson => {
+    response.json(savedPerson.toJSON())
+  }).catch(error => next(error))
+
 })
 
 app.get('/info', (req, res) => {
@@ -98,7 +87,12 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError' && error.kind == 'ObjectId') {
     return response.status(400).send({ error: 'nonexisting id' })
   }
-
+  
+  if(error.code === 11000){
+    return response.status(400).send({error: 'Name is already in use'})
+  }
+  
   next(error)
 }
+
 app.use(errorHandler)
